@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>French Global History</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root { --bg:#030814; --accent:#2563eb; --muted:#93a3bd; color-scheme: dark; }
+    body {
+      margin:0; min-height:100vh; display:flex; flex-direction:column;
+      justify-content:center; align-items:center;
+      background:linear-gradient(180deg,#010a1f,#041836);
+      font-family:'Poppins',sans-serif; color:#e6eef8;
+      padding:20px; text-align:center;
+    }
+    h1 {
+      font-size:1.6rem; font-weight:700;
+      margin-bottom:6px; letter-spacing:1px;
+    }
+    h2 {
+      font-size:1rem; font-weight:400;
+      color:var(--muted); margin-bottom:18px;
+    }
+    video {
+      width:90%; max-width:900px; border-radius:10px;
+      box-shadow:0 6px 25px rgba(0,0,0,0.5);
+      background:#000;
+    }
+    .controls {
+      display:flex; gap:10px; justify-content:center;
+      margin-top:14px; flex-wrap:wrap;
+    }
+    .btn {
+      background:var(--accent); border:none; color:white;
+      padding:8px 16px; border-radius:8px; cursor:pointer;
+      font-weight:600; font-size:0.9rem;
+      transition:0.2s;
+    }
+    .btn:hover { background:#1d4ed8; }
+    .btn.active { background:#1e40af; }
+    input[type=range] {
+      -webkit-appearance:none; width:80%; max-width:700px;
+      height:6px; border-radius:6px;
+      background:rgba(255,255,255,0.1); margin-top:10px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance:none; width:14px; height:14px;
+      border-radius:50%; background:white; cursor:pointer;
+    }
+    footer {
+      margin-top:20px; font-size:0.9rem; color:var(--muted);
+    }
+    .video-container {
+      position:relative; width:90%; max-width:900px;
+    }
+    .loading { color:var(--muted); font-style:italic; }
+    
+    /* Subtitle Controls */
+    .subtitle-controls {
+      display:flex; gap:10px; justify-content:center;
+      margin:15px 0; flex-wrap:wrap;
+    }
+    .subtitle-btn {
+      background:#475569; border:none; color:white;
+      padding:8px 16px; border-radius:8px; cursor:pointer;
+      font-weight:600; font-size:0.9rem; transition:0.2s;
+    }
+    .subtitle-btn:hover { background:#64748b; }
+    .subtitle-btn.active { background:#2563eb; }
+    
+    /* Status Message */
+    .status-message {
+      margin:10px 0; padding:10px; border-radius:8px;
+      background:#1e293b; font-size:0.9rem; max-width:500px;
+    }
+    .status-message.success { background:#064e3b; color:#6ee7b7; }
+    .status-message.error { background:#7f1d1d; color:#fca5a5; }
+  </style>
+</head>
+<body>
+  <h1>FRENCH GLOBAL HISTORY</h1>
+  <h2>Done by<br>
+    A TAMIL SELVAN (RA2512707010018)<br>
+    B ASHWIN (RA2511003012359)
+  </h2>
+
+  <div class="video-container">
+    <video id="player" controls preload="metadata">
+      <!-- Your France.mp4 video -->
+      <source src="France.mp4" type="video/mp4">
+      
+      <!-- YOUR FRANCE.VTT SUBTITLES -->
+      <track label="English" kind="subtitles" srclang="en" src="France.vtt" default>
+      
+      Your browser does not support HTML5 video.
+    </video>
+    
+    <div class="loading" id="loadingMessage">
+      Loading video with subtitles...
+    </div>
+  </div>
+
+  <!-- Subtitle Controls -->
+  <div class="subtitle-controls">
+    <button id="subtitleOn" class="subtitle-btn active">📺 Subtitles ON</button>
+    <button id="subtitleOff" class="subtitle-btn">❌ Subtitles OFF</button>
+  </div>
+  
+  <div class="status-message success" id="statusMessage">
+    ✅ Real subtitles loaded from France.vtt!
+  </div>
+
+  <div class="controls">
+    <button id="backBtn" class="btn">« 10s</button>
+    <button id="playBtn" class="btn">Play / Pause</button>
+    <button id="forwardBtn" class="btn">10s »</button>
+  </div>
+
+  <input id="seek" type="range" min="0" max="100" value="0" step="0.1">
+
+  <footer>French Global History Project - Professional Subtitles</footer>
+
+<script>
+  const player = document.getElementById('player');
+  const playBtn = document.getElementById('playBtn');
+  const backBtn = document.getElementById('backBtn');
+  const forwardBtn = document.getElementById('forwardBtn');
+  const seek = document.getElementById('seek');
+  const loadingMessage = document.getElementById('loadingMessage');
+  const subtitleOn = document.getElementById('subtitleOn');
+  const subtitleOff = document.getElementById('subtitleOff');
+  const statusMessage = document.getElementById('statusMessage');
+
+  // Subtitle management
+  function enableSubtitles() {
+    if (player.textTracks.length > 0) {
+      player.textTracks[0].mode = 'showing';
+    }
+    subtitleOn.classList.add('active');
+    subtitleOff.classList.remove('active');
+    statusMessage.textContent = "✅ Subtitles ON - Real captions from France.vtt";
+    statusMessage.className = "status-message success";
+  }
+
+  function disableSubtitles() {
+    if (player.textTracks.length > 0) {
+      player.textTracks[0].mode = 'disabled';
+    }
+    subtitleOn.classList.remove('active');
+    subtitleOff.classList.add('active');
+    statusMessage.textContent = "❌ Subtitles OFF";
+    statusMessage.className = "status-message error";
+  }
+
+  // Check if subtitles are available
+  function checkSubtitles() {
+    if (player.textTracks.length > 0) {
+      statusMessage.textContent = "✅ France.vtt subtitles loaded successfully!";
+      // Auto-enable subtitles
+      enableSubtitles();
+    } else {
+      statusMessage.innerHTML = 
+        '❌ France.vtt file not found.<br>' +
+        'Make sure "France.vtt" is in the same folder as this HTML file.';
+      statusMessage.className = "status-message error";
+      subtitleOn.disabled = true;
+      subtitleOff.disabled = true;
+    }
+  }
+
+  // Event listeners for subtitle controls
+  subtitleOn.addEventListener('click', enableSubtitles);
+  subtitleOff.addEventListener('click', disableSubtitles);
+
+  // Video event listeners
+  player.addEventListener('loadeddata', () => {
+    loadingMessage.style.display = 'none';
+    checkSubtitles();
+  });
+  
+  player.addEventListener('error', () => {
+    loadingMessage.innerHTML = 
+      '❌ Video failed to load.<br>' +
+      'Make sure "France.mp4" and "France.vtt" are in the same folder.';
+    loadingMessage.style.color = '#ff6b6b';
+  });
+
+  // Show current subtitle in console (for debugging)
+  player.addEventListener('timeupdate', () => {
+    if (!isNaN(player.duration)) {
+      seek.value = (player.currentTime / player.duration) * 100;
+    }
+    
+    // Debug: Show active subtitles in console
+    if (player.textTracks.length > 0 && player.textTracks[0].activeCues.length > 0) {
+      const currentSubtitle = player.textTracks[0].activeCues[0].text;
+      console.log('Current subtitle:', currentSubtitle);
+    }
+  });
+
+  playBtn.addEventListener('click', () => player.paused ? player.play() : player.pause());
+  backBtn.addEventListener('click', () => player.currentTime = Math.max(0, player.currentTime - 10));
+  forwardBtn.addEventListener('click', () => player.currentTime = Math.min(player.duration, player.currentTime + 10));
+
+  seek.addEventListener('input', () => {
+    if (!isNaN(player.duration)) player.currentTime = (seek.value / 100) * player.duration;
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') { 
+      e.preventDefault(); 
+      player.paused ? player.play() : player.pause(); 
+    }
+    if (e.code === 'ArrowLeft') player.currentTime = Math.max(0, player.currentTime - 10);
+    if (e.code === 'ArrowRight') player.currentTime = Math.min(player.duration, player.currentTime + 10);
+    
+    // Subtitle shortcuts
+    if (e.code === 'KeyC') enableSubtitles();
+    if (e.code === 'KeyX') disableSubtitles();
+  });
+
+  // Auto-check subtitles when metadata loads
+  player.addEventListener('loadedmetadata', checkSubtitles);
+</script>
+</body>
+</html>
